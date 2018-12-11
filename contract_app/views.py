@@ -3,6 +3,11 @@ from rest_framework import generics
 # from rest_framework.response import Response
 from .models import Client, Contract
 from .serializers import ContractSerializer, ClientSerializer
+from django.shortcuts import redirect
+
+
+def index(request):
+    return redirect('docs/')
 
 
 class ContractList(generics.ListCreateAPIView):
