@@ -33,6 +33,9 @@ class MyUser(AbstractBaseUser):
 class Client(models.Model):
     name = models.CharField(max_length=30)
 
+    def __str__(self):
+        return ':'.join([str(self.id), self.name])
+
 
 class Contract(models.Model):
     CREATED = 'created'
@@ -52,11 +55,14 @@ class Contract(models.Model):
     date_end = models.DateField()
     content = models.CharField(max_length=5000)
     clients = models.ManyToManyField(Client)
-    status = models.CharField(choices=STATUS_CHOICES, default=CREATED)
+    status = models.CharField(choices=STATUS_CHOICES, default=CREATED, max_length=50)
     # attachment with 10 MB max size
     # attachment = models.BinaryField(null=True, editable=True, max_length=10 * 1024 * 1024)
     # todo: add model data validation in clean and save,
     # such as procudure control, and date comparison
+
+    def __str__(self):
+        return ':'.join([str(self.id), self.title])
 
 
 class Countersign(models.Model):
