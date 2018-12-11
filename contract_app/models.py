@@ -55,7 +55,7 @@ class Contract(models.Model):
     status = models.CharField(choices=STATUS_CHOICES, default=CREATED)
     # attachment with 10 MB max size
     # attachment = models.BinaryField(null=True, editable=True, max_length=10 * 1024 * 1024)
-    # todo: add models data validation in clean and save,
+    # todo: add model data validation in clean and save,
     # such as procudure control, and date comparison
 
 
