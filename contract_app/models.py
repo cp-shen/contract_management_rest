@@ -27,7 +27,7 @@ class MyUserManager(BaseUserManager):
 
 class MyUser(AbstractBaseUser):
     email = models.EmailField(max_length=255, unique=True)
-    username = models.EmailField(max_length=255, unique=True)
+    username = models.CharField(max_length=255, unique=True)
 
     objects = MyUserManager()
 
@@ -106,12 +106,20 @@ class Contract(models.Model):
             self.check_review()
             self.check_sign()
 
+    def save(self, *args, **kwargs):
+        # run validations
+        self.full_clean()
+        return super(Contract, self).save(*args, **kwargs)
+
 
 class Countersign(models.Model):
     user = models.ForeignKey(MyUser, on_delete=models.CASCADE, editable=False)
     contract = models.ForeignKey(Contract, on_delete=models.CASCADE, editable=False)
     message = models.CharField(max_length=1000)
     is_confirmed = models.BooleanField(default=False)
+
+    class Meta:
+        unique_together = (("user", "contract"),)
 
 
 class Review(models.Model):
@@ -120,9 +128,15 @@ class Review(models.Model):
     message = models.CharField(max_length=1000)
     is_confirmed = models.BooleanField(default=False)
 
+    class Meta:
+        unique_together = (("user", "contract"),)
+
 
 class Sign(models.Model):
     user = models.ForeignKey(MyUser, on_delete=models.CASCADE, editable=False)
     contract = models.ForeignKey(Contract, on_delete=models.CASCADE, editable=False)
     message = models.CharField(max_length=1000)
     is_confirmed = models.BooleanField(default=False)
+
+    class Meta:
+        unique_together = (("user", "contract"),)

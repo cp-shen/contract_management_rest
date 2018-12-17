@@ -1,5 +1,58 @@
 from rest_framework import serializers
-from .models import Contract, Client
+from . import models
+
+
+class ClientSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Client
+        fields = (
+            'id', 'username',
+        )
+
+
+class CountersignSerializer(serializers.ModelSerializer):
+    user = serializers.PrimaryKeyRelatedField(
+        queryset=models.MyUser.objects.all()
+    )
+    contract = serializers.PrimaryKeyRelatedField(
+        queryset=models.Contract.objects.all()
+    )
+
+    class Meta:
+        model = models.Countersign
+        fields = (
+            'user', 'contract', 'message', 'is_confirmed',
+        )
+
+
+class ReivewSerializer(serializers.ModelSerializer):
+    user = serializers.PrimaryKeyRelatedField(
+        queryset=models.MyUser.objects.all()
+    )
+    contract = serializers.PrimaryKeyRelatedField(
+        queryset=models.Contract.objects.all()
+    )
+
+    class Meta:
+        model = models.Review
+        fields = (
+            'user', 'contract', 'message', 'is_confirmed',
+        )
+
+
+class SignSerializer(serializers.ModelSerializer):
+    user = serializers.PrimaryKeyRelatedField(
+        queryset=models.MyUser.objects.all()
+    )
+    contract = serializers.PrimaryKeyRelatedField(
+        queryset=models.Contract.objects.all()
+    )
+
+    class Meta:
+        model = models.Sign
+        fields = (
+            'user', 'contract', 'message', 'is_confirmed',
+        )
 
 
 class ContractSerializer(serializers.ModelSerializer):
@@ -7,23 +60,19 @@ class ContractSerializer(serializers.ModelSerializer):
         read_only=True,
         slug_field='username'
     )
+    countersign_set = CountersignSerializer(many=True, read_only=True)
+    review_set = ReivewSerializer(many=True, read_only=True)
+    sign_set = SignSerializer(many=True, read_only=True)
 
     class Meta:
-        model = Contract
+        model = models.Contract
         fields = (
             'id', 'title', 'date_begin', 'date_end', 'content',
-            'clients', 'status', 'author',
+            'clients', 'status', 'author', 
+            'countersign_set', 'review_set', 'sign_set'
         )
 
     def validate(self, data):
         if data['date_begin'] > data['date_end']:
             raise serializers.ValidationError("contract finish must occur after start")
         return data
-
-
-class ClientSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Client
-        fields = (
-            'id', 'name',
-        )
