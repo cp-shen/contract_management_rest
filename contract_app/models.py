@@ -6,6 +6,24 @@ from django.contrib.auth.models import (
 )
 
 
+class Role(models.Model):
+    name = models.CharField(max_length=100, unique=True)
+
+    can_read_contracts = models.BooleanField(default=False)
+    can_write_contracts = models.BooleanField(default=False)
+    can_countersign = models.BooleanField(default=False)
+    can_set_countersign = models.BooleanField(default=False)
+    can_review = models.BooleanField(default=False)
+    can_set_review = models.BooleanField(default=False)
+    can_sign = models.BooleanField(default=False)
+    can_set_sign = models.BooleanField(default=False)
+
+    can_read_users = models.BooleanField(default=False)
+    can_write_users = models.BooleanField(default=False)
+    can_read_roles = models.BooleanField(default=False)
+    can_write_roles = models.BooleanField(default=False)
+
+
 class MyUserManager(BaseUserManager):
     def create_user(self, email, username, password):
         if not email:
@@ -34,9 +52,9 @@ class MyUser(AbstractBaseUser):
     USERNAME_FIELD = 'email'
 
     def __str__(self):
-        return self.email
+        return self.username
 
-    # todo: set user permissions
+    roles = models.ManyToManyField(Role, related_name='users')
 
 
 class Client(models.Model):
@@ -92,6 +110,9 @@ class Contract(models.Model):
             raise ValidationError('%s people have not signed' % count)
 
     def clean(self):
+        if self.date_begin > self.date_end:
+            raise ValidationError("contract finish must occur after start")
+
         if self.status == self.CREATED:
             pass
         elif self.status == self.COUNTERSIGNED:

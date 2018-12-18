@@ -6,7 +6,7 @@ class ClientSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Client
         fields = (
-            'id', 'username',
+            'id', 'name',
         )
 
 
@@ -68,7 +68,7 @@ class ContractSerializer(serializers.ModelSerializer):
         model = models.Contract
         fields = (
             'id', 'title', 'date_begin', 'date_end', 'content',
-            'clients', 'status', 'author', 
+            'clients', 'status', 'author',
             'countersign_set', 'review_set', 'sign_set'
         )
 
