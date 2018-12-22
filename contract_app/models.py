@@ -54,11 +54,11 @@ class MyUser(AbstractBaseUser):
     def __str__(self):
         return self.username
 
-    roles = models.ManyToManyField(Role, related_name='users')
+    role = models.ForeignKey(Role, related_name='users', on_delete=models.PROTECT)
 
 
 class Client(models.Model):
-    name = models.CharField(max_length=30)
+    name = models.CharField(max_length=50, unique=True)
 
     def __str__(self):
         return ':'.join([str(self.id), self.name])
@@ -136,7 +136,7 @@ class Contract(models.Model):
 class Countersign(models.Model):
     user = models.ForeignKey(MyUser, on_delete=models.CASCADE, editable=False)
     contract = models.ForeignKey(Contract, on_delete=models.CASCADE, editable=False)
-    message = models.CharField(max_length=1000)
+    message = models.CharField(max_length=1000, null=True)
     is_confirmed = models.BooleanField(default=False)
 
     class Meta:
@@ -146,7 +146,7 @@ class Countersign(models.Model):
 class Review(models.Model):
     user = models.ForeignKey(MyUser, on_delete=models.CASCADE, editable=False)
     contract = models.ForeignKey(Contract, on_delete=models.CASCADE, editable=False)
-    message = models.CharField(max_length=1000)
+    message = models.CharField(max_length=1000, null=True)
     is_confirmed = models.BooleanField(default=False)
 
     class Meta:
@@ -156,7 +156,7 @@ class Review(models.Model):
 class Sign(models.Model):
     user = models.ForeignKey(MyUser, on_delete=models.CASCADE, editable=False)
     contract = models.ForeignKey(Contract, on_delete=models.CASCADE, editable=False)
-    message = models.CharField(max_length=1000)
+    message = models.CharField(max_length=1000, null=True)
     is_confirmed = models.BooleanField(default=False)
 
     class Meta:

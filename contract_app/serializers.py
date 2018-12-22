@@ -57,12 +57,17 @@ class SignSerializer(serializers.ModelSerializer):
 
 class ContractSerializer(serializers.ModelSerializer):
     author = serializers.SlugRelatedField(
-        read_only=True,
-        slug_field='username'
+        slug_field='username',
+        queryset=models.MyUser.objects.all()
     )
     countersign_set = CountersignSerializer(many=True, read_only=True)
     review_set = ReivewSerializer(many=True, read_only=True)
     sign_set = SignSerializer(many=True, read_only=True)
+    clients = serializers.SlugRelatedField(
+        many=True,
+        slug_field='name',
+        queryset=models.Client.objects.all()
+    )
 
     class Meta:
         model = models.Contract
