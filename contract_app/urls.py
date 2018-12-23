@@ -14,6 +14,9 @@ urlpatterns = [
     path('reviews/<int:pk>/', views.ReviewDetail.as_view()),
     path('signs/', views.SignList.as_view()),
     path('signs/<int:pk>/', views.SignDetail.as_view()),
+    path('roles/', views.RoleList.as_view()),
+    path('roles/<int:pk>/', views.RoleDetail.as_view()),
+    path('register/', views.Register.as_view()),
 ]
 
 # urlpatterns = format_suffix_patterns(urlpatterns)

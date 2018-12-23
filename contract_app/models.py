@@ -62,7 +62,7 @@ class MyUser(AbstractBaseUser):
         Role,
         related_name='users',
         on_delete=models.PROTECT,
-        defult=1,
+        null=True,
     )
 
 
@@ -101,7 +101,7 @@ class Contract(models.Model):
     # attachment with 10 MB max size
     # attachment = models.BinaryField(null=True, editable=True, max_length=10 * 1024 * 1024)
 
-    author = models.ForeignKey(MyUser, on_delete=models.CASCADE, editable=False)
+    author = models.ForeignKey(MyUser, on_delete=models.CASCADE, editable=False, related_name='contracts_created')
     users_countersign = models.ManyToManyField(MyUser, through='Countersign', related_name='contracts_countersign')
     users_review = models.ManyToManyField(MyUser, through='Review', related_name='contracts_review')
     users_sign = models.ManyToManyField(MyUser, through='Sign', related_name='contracts_sign')
@@ -149,8 +149,8 @@ class Contract(models.Model):
 
 
 class Countersign(models.Model):
-    user = models.ForeignKey(MyUser, on_delete=models.CASCADE, editable=False)
-    contract = models.ForeignKey(Contract, on_delete=models.CASCADE, editable=False)
+    user = models.ForeignKey(MyUser, on_delete=models.CASCADE, editable=False, related_name='countersigns')
+    contract = models.ForeignKey(Contract, on_delete=models.CASCADE, editable=False, related_name='countersigns')
     message = models.CharField(max_length=1000, null=True)
     is_confirmed = models.BooleanField(default=False)
 
@@ -159,8 +159,8 @@ class Countersign(models.Model):
 
 
 class Review(models.Model):
-    user = models.ForeignKey(MyUser, on_delete=models.CASCADE, editable=False)
-    contract = models.ForeignKey(Contract, on_delete=models.CASCADE, editable=False)
+    user = models.ForeignKey(MyUser, on_delete=models.CASCADE, editable=False, related_name='reviews')
+    contract = models.ForeignKey(Contract, on_delete=models.CASCADE, editable=False, related_name='reviews')
     message = models.CharField(max_length=1000, null=True)
     is_confirmed = models.BooleanField(default=False)
 
@@ -169,8 +169,8 @@ class Review(models.Model):
 
 
 class Sign(models.Model):
-    user = models.ForeignKey(MyUser, on_delete=models.CASCADE, editable=False)
-    contract = models.ForeignKey(Contract, on_delete=models.CASCADE, editable=False)
+    user = models.ForeignKey(MyUser, on_delete=models.CASCADE, editable=False, related_name='signs')
+    contract = models.ForeignKey(Contract, on_delete=models.CASCADE, editable=False, related_name='signs')
     message = models.CharField(max_length=1000, null=True)
     is_confirmed = models.BooleanField(default=False)
 

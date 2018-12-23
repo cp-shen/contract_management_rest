@@ -2,6 +2,12 @@ from rest_framework import serializers
 from . import models
 
 
+class RoleSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Role
+        fields = '__all__'
+
+
 class ClientSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Client
@@ -81,3 +87,47 @@ class ContractSerializer(serializers.ModelSerializer):
         if data['date_begin'] > data['date_end']:
             raise serializers.ValidationError("contract finish must occur after start")
         return data
+
+
+class RegisterSerializer(serializers.Serializer):
+    username = serializers.CharField(max_length=50, min_length=1)
+    email = serializers.EmailField()
+    password = serializers.CharField(max_length=50, min_length=6, write_only=True)
+
+    def validate(self, data):
+        if models.MyUser.objects.filter(username=data['username']).count() > 0:
+            raise serializers.ValidationError('username already taken.')
+        if models.MyUser.objects.filter(email=data['email']).count() > 0:
+            raise serializers.ValidationError('email already taken.')
+        return data
+
+    def create(self, validated_data):
+        user =  models.MyUser.objects.create_user(
+            validated_data['email'], validated_data['username'], validated_data['password'])
+        return user
+
+
+class MyUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.MyUser
+        fields = (
+            'email', 'username', 'role', 
+            'contracts_created', 'countersigns', 'reviews', 'signs',
+        )
+
+
+class MyUserUnsafeSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(max_length=50, min_length=6, write_only=True)
+
+    class Meta:
+        model = models.MyUser
+        fields = (
+            'email', 'username', 'role', 'auth_token',
+            'contracts_created', 'countersigns', 'reviews', 'signs',
+        )
+
+    def partial_update(self, instance, validated_data):
+        password = validated_data.get('password')
+        if password is not None:
+            instance.set_password(password)
+        return instance
