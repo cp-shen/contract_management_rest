@@ -62,16 +62,23 @@ class SignSerializer(serializers.ModelSerializer):
 
 
 class ContractSerializer(serializers.ModelSerializer):
-    author = serializers.SlugRelatedField(
-        slug_field='username',
+    # author = serializers.SlugRelatedField(
+    #     slug_field='username',
+    #     queryset=models.MyUser.objects.all()
+    # )
+    author = serializers.PrimaryKeyRelatedField(
         queryset=models.MyUser.objects.all()
     )
     countersign_set = CountersignSerializer(many=True, read_only=True)
     review_set = ReivewSerializer(many=True, read_only=True)
     sign_set = SignSerializer(many=True, read_only=True)
-    clients = serializers.SlugRelatedField(
+    # clients = serializers.SlugRelatedField(
+    #     many=True,
+    #     slug_field='name',
+    #     queryset=models.Client.objects.all()
+    # )
+    clients = serializers.PrimaryKeyRelatedField(
         many=True,
-        slug_field='name',
         queryset=models.Client.objects.all()
     )
 
@@ -102,7 +109,7 @@ class RegisterSerializer(serializers.Serializer):
         return data
 
     def create(self, validated_data):
-        user =  models.MyUser.objects.create_user(
+        user = models.MyUser.objects.create_user(
             validated_data['email'], validated_data['username'], validated_data['password'])
         return user
 
@@ -111,23 +118,30 @@ class MyUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.MyUser
         fields = (
-            'email', 'username', 'role', 
+            'email', 'username', 'role',
             'contracts_created', 'countersigns', 'reviews', 'signs',
         )
+    # role = serializers.SlugRelatedField(
+    #     slug_field='name', queryset=models.Role.objects.all())
+    role = serializers.PrimaryKeyRelatedField(queryset=models.Role.objects.all())
+    contracts_created = ContractSerializer(many=True)
+    countersigns = CountersignSerializer(many=True)
+    reviews = ReivewSerializer(many=True)
+    signs = SignSerializer(many=True)
 
 
-class MyUserUnsafeSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(max_length=50, min_length=6, write_only=True)
+# class MyUserUnsafeSerializer(serializers.ModelSerializer):
+#     password = serializers.CharField(max_length=50, min_length=6, write_only=True)
 
-    class Meta:
-        model = models.MyUser
-        fields = (
-            'email', 'username', 'role', 'auth_token',
-            'contracts_created', 'countersigns', 'reviews', 'signs',
-        )
+#     class Meta:
+#         model = models.MyUser
+#         fields = (
+#             'email', 'username', 'role', 'auth_token',
+#             'contracts_created', 'countersigns', 'reviews', 'signs',
+#         )
 
-    def partial_update(self, instance, validated_data):
-        password = validated_data.get('password')
-        if password is not None:
-            instance.set_password(password)
-        return instance
+#     def partial_update(self, instance, validated_data):
+#         password = validated_data.get('password')
+#         if password is not None:
+#             instance.set_password(password)
+#         return instance

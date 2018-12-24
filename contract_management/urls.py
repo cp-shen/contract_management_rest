@@ -15,15 +15,10 @@ Including another URLconf
 """
 # from django.contrib import admin
 from django.urls import path, include
-from django.conf.urls import url
-from rest_framework.documentation import include_docs_urls
-from rest_framework.authtoken import views
+# from django.conf.urls import url
 
 
 urlpatterns = [
     path('', include('contract_app.urls')),
-    url(r'^docs/', include_docs_urls(title='Contract Management API', public=False)),
     # path('admin/', admin.site.urls),
-    path('auth/', include('rest_framework.urls')),
-    url(r'^token/', views.obtain_auth_token),
 ]

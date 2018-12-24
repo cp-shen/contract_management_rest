@@ -15,17 +15,17 @@ class Role(models.Model):
 
     can_read_contracts = models.BooleanField(default=False)
     can_write_contracts = models.BooleanField(default=False)
+
     can_countersign = models.BooleanField(default=False)
-    can_set_countersign = models.BooleanField(default=False)
     can_review = models.BooleanField(default=False)
-    can_set_review = models.BooleanField(default=False)
     can_sign = models.BooleanField(default=False)
-    can_set_sign = models.BooleanField(default=False)
+    can_distribute = models.BooleanField(default=False)
 
     can_read_users = models.BooleanField(default=False)
     can_write_users = models.BooleanField(default=False)
     can_read_roles = models.BooleanField(default=False)
     can_write_roles = models.BooleanField(default=False)
+    can_manage_clients = models.BooleanField(default=False)
 
 
 class MyUserManager(BaseUserManager):
@@ -74,6 +74,7 @@ def create_auth_token(sender, instance=None, created=False, **kwargs):
 
 class Client(models.Model):
     name = models.CharField(max_length=50, unique=True)
+    email = models.EmailField(max_length=255, unique=True)
 
     def __str__(self):
         return ':'.join([str(self.id), self.name])
@@ -81,16 +82,18 @@ class Client(models.Model):
 
 class Contract(models.Model):
     CREATED = 'created'
+    DISTRIBUTED = 'distributed'
     COUNTERSIGNED = 'countersigned'
     REWRITED = 'rewrited'
     REVIEWED = 'reviewed'
     SIGNED = 'signed'
     STATUS_CHOICES = (
-        (CREATED, 'Created'),
-        (COUNTERSIGNED, 'Countersigned'),
-        (REWRITED, 'Rewrited'),
-        (REVIEWED, 'Reviewed'),
-        (SIGNED, 'Signed'),
+        (CREATED, 'created'),
+        (DISTRIBUTED, 'distributed'),
+        (COUNTERSIGNED, 'countersigned'),
+        (REWRITED, 'rewrited'),
+        (REVIEWED, 'reviewed'),
+        (SIGNED, 'signed'),
     )
     title = models.CharField(max_length=50)
     date_begin = models.DateField()
