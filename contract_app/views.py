@@ -127,7 +127,7 @@ class MyDetail(generics.GenericAPIView):
 class UserList(generics.ListAPIView):
     queryset = models.MyUser.objects.all()
     serializer_class = serializers.MyUserSerializer
-    filterset_fields = ('role')
+    filterset_fields = ('role',)
 
 
 class UserDetail(generics.RetrieveUpdateAPIView):

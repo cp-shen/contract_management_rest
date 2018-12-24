@@ -12,3 +12,8 @@
 - [x] contract save error handling
 - [x] name to id
 - [ ] role not needed
+- [ ] test cases
+- [x] auto change contract status (using signal)
+- [ ] email sending (using signal)
+- [x] add help text
+- [x] validate contract model data before saving (using signal)

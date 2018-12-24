@@ -12,16 +12,18 @@ class ClientSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Client
         fields = (
-            'id', 'name',
+            'id', 'name', 'email'
         )
 
 
 class CountersignSerializer(serializers.ModelSerializer):
     user = serializers.PrimaryKeyRelatedField(
-        queryset=models.MyUser.objects.all()
+        queryset=models.MyUser.objects.all(),
+        help_text='user id',
     )
     contract = serializers.PrimaryKeyRelatedField(
-        queryset=models.Contract.objects.all()
+        queryset=models.Contract.objects.all(),
+        help_text='contract id',
     )
 
     class Meta:
@@ -33,10 +35,12 @@ class CountersignSerializer(serializers.ModelSerializer):
 
 class ReivewSerializer(serializers.ModelSerializer):
     user = serializers.PrimaryKeyRelatedField(
-        queryset=models.MyUser.objects.all()
+        queryset=models.MyUser.objects.all(),
+        help_text='user id',
     )
     contract = serializers.PrimaryKeyRelatedField(
-        queryset=models.Contract.objects.all()
+        queryset=models.Contract.objects.all(),
+        help_text='contract id',
     )
 
     class Meta:
@@ -48,10 +52,12 @@ class ReivewSerializer(serializers.ModelSerializer):
 
 class SignSerializer(serializers.ModelSerializer):
     user = serializers.PrimaryKeyRelatedField(
-        queryset=models.MyUser.objects.all()
+        queryset=models.MyUser.objects.all(),
+        help_text='user id',
     )
     contract = serializers.PrimaryKeyRelatedField(
-        queryset=models.Contract.objects.all()
+        queryset=models.Contract.objects.all(),
+        help_text='contract id',
     )
 
     class Meta:
@@ -67,11 +73,12 @@ class ContractSerializer(serializers.ModelSerializer):
     #     queryset=models.MyUser.objects.all()
     # )
     author = serializers.PrimaryKeyRelatedField(
-        queryset=models.MyUser.objects.all()
+        queryset=models.MyUser.objects.all(),
+        help_text='user id of the author',
     )
-    countersign_set = CountersignSerializer(many=True, read_only=True)
-    review_set = ReivewSerializer(many=True, read_only=True)
-    sign_set = SignSerializer(many=True, read_only=True)
+    countersigns = CountersignSerializer(many=True, read_only=True)
+    reviews = ReivewSerializer(many=True, read_only=True)
+    signs = SignSerializer(many=True, read_only=True)
     # clients = serializers.SlugRelatedField(
     #     many=True,
     #     slug_field='name',
@@ -79,7 +86,8 @@ class ContractSerializer(serializers.ModelSerializer):
     # )
     clients = serializers.PrimaryKeyRelatedField(
         many=True,
-        queryset=models.Client.objects.all()
+        queryset=models.Client.objects.all(),
+        help_text='id of each client',
     )
 
     class Meta:
@@ -87,7 +95,7 @@ class ContractSerializer(serializers.ModelSerializer):
         fields = (
             'id', 'title', 'date_begin', 'date_end', 'content',
             'clients', 'status', 'author',
-            'countersign_set', 'review_set', 'sign_set'
+            'countersigns', 'reviews', 'signs'
         )
 
     def validate(self, data):
@@ -123,7 +131,7 @@ class MyUserSerializer(serializers.ModelSerializer):
         )
     # role = serializers.SlugRelatedField(
     #     slug_field='name', queryset=models.Role.objects.all())
-    role = serializers.PrimaryKeyRelatedField(queryset=models.Role.objects.all())
+    role = serializers.PrimaryKeyRelatedField(queryset=models.Role.objects.all(), help_text='rold id')
     contracts_created = ContractSerializer(many=True)
     countersigns = CountersignSerializer(many=True)
     reviews = ReivewSerializer(many=True)

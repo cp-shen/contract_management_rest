@@ -5,7 +5,7 @@ from django.contrib.auth.models import (
     AbstractBaseUser,
 )
 from django.conf import settings
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
 from rest_framework.authtoken.models import Token
 
@@ -74,7 +74,7 @@ def create_auth_token(sender, instance=None, created=False, **kwargs):
 
 class Client(models.Model):
     name = models.CharField(max_length=50, unique=True)
-    email = models.EmailField(max_length=255, unique=True)
+    email = models.EmailField(max_length=255, unique=True, null=True)
 
     def __str__(self):
         return ':'.join([str(self.id), self.name])
@@ -100,7 +100,10 @@ class Contract(models.Model):
     date_end = models.DateField()
     content = models.CharField(max_length=5000)
     clients = models.ManyToManyField(Client)
-    status = models.CharField(choices=STATUS_CHOICES, default=CREATED, max_length=50)
+    status = models.CharField(
+        choices=STATUS_CHOICES, default=CREATED, max_length=50,
+        help_text='created (default), distributed, countersigned, rewrited, reviewed, signed'
+    )
     # attachment with 10 MB max size
     # attachment = models.BinaryField(null=True, editable=True, max_length=10 * 1024 * 1024)
 
@@ -145,10 +148,35 @@ class Contract(models.Model):
             self.check_review()
             self.check_sign()
 
-    def save(self, *args, **kwargs):
-        # run validations
-        self.full_clean()
-        return super(Contract, self).save(*args, **kwargs)
+
+@receiver(pre_save, sender=Contract)
+def contract_pre_save_clean(sender, instance, *args, **kwargs):
+    instance.full_clean()
+
+
+@receiver(post_save, sender=Contract)
+def contract_post_save_handler(sender, instance, *args, **kwargs):
+    try:
+        if instance.status == Contract.CREATED:
+            pass
+        elif instance.status == Contract.DISTRIBUTED:
+            instance.check_countersign()
+            instance.status = Contract.COUNTERSIGNED
+            instance.save()
+        elif instance.status == Contract.COUNTERSIGNED:
+            pass
+        elif instance.status == Contract.REWRITED:
+            instance.check_review()
+            instance.status = Contract.REVIEWED
+            instance.save()
+        elif instance.status == Contract.REVIEWED:
+            instance.check_sign()
+            instance.status = Contract.SIGNED
+            instance.save()
+        elif instance.status == Contract.SIGNED:
+            pass
+    except ValidationError:
+        pass
 
 
 class Countersign(models.Model):
