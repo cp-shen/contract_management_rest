@@ -126,16 +126,16 @@ class MyUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.MyUser
         fields = (
-            'email', 'username', 'role',
+            'email', 'username', 'role', 'id',
             'contracts_created', 'countersigns', 'reviews', 'signs',
         )
     # role = serializers.SlugRelatedField(
     #     slug_field='name', queryset=models.Role.objects.all())
-    role = serializers.PrimaryKeyRelatedField(queryset=models.Role.objects.all(), help_text='rold id')
-    contracts_created = ContractSerializer(many=True)
-    countersigns = CountersignSerializer(many=True)
-    reviews = ReivewSerializer(many=True)
-    signs = SignSerializer(many=True)
+    role = serializers.PrimaryKeyRelatedField(queryset=models.Role.objects.all(), help_text='role id')
+    contracts_created = ContractSerializer(many=True, read_only=True)
+    countersigns = CountersignSerializer(many=True, read_only=True)
+    reviews = ReivewSerializer(many=True, read_only=True)
+    signs = SignSerializer(many=True, read_only=True)
 
 
 # class MyUserUnsafeSerializer(serializers.ModelSerializer):
