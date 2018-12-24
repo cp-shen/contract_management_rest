@@ -21,10 +21,8 @@ class Role(models.Model):
     can_sign = models.BooleanField(default=False)
     can_distribute = models.BooleanField(default=False)
 
-    can_read_users = models.BooleanField(default=False)
-    can_write_users = models.BooleanField(default=False)
-    can_read_roles = models.BooleanField(default=False)
-    can_write_roles = models.BooleanField(default=False)
+    can_manage_users = models.BooleanField(default=False)
+    can_manage_roles = models.BooleanField(default=False)
     can_manage_clients = models.BooleanField(default=False)
 
 
@@ -156,6 +154,9 @@ def contract_pre_save_clean(sender, instance, *args, **kwargs):
 
 @receiver(post_save, sender=Contract)
 def contract_post_save_handler(sender, instance, *args, **kwargs):
+    """
+    automatically change the status afer saving contract objects
+    """
     try:
         if instance.status == Contract.CREATED:
             pass
