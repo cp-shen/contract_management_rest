@@ -124,6 +124,20 @@ class MyDetail(generics.GenericAPIView):
         return Response(serializers.MyUserSerializer(request.user).data)
 
 
+class ChangePwd(generics.GenericAPIView):
+    permission_classes = (permissions.IsAuthenticated, )
+    serializer_class = serializers.PwdSerializer
+
+    def post(self, request, format=None):
+        serializer = serializers.PwdSerializer(data=request.data)
+        if serializer.is_valid():
+            request.user.set_password(serializer.validated_data['password'])
+            request.user.save()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
 class UserList(generics.ListAPIView):
     queryset = models.MyUser.objects.all()
     serializer_class = serializers.MyUserSerializer

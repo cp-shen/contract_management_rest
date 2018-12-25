@@ -23,6 +23,7 @@ urlpatterns = [
     path('users/<int:pk>/', views.UserDetail.as_view()),
     path('register/', views.Register.as_view()),
     path('me/', views.MyDetail.as_view()),
+    path('changepassword/', views.ChangePwd.as_view()),
 
     path('auth/', include('rest_framework.urls')),
     url(r'^token/', obtain_auth_token),

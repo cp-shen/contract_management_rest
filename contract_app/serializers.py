@@ -138,18 +138,6 @@ class MyUserSerializer(serializers.ModelSerializer):
     signs = SignSerializer(many=True, read_only=True)
 
 
-# class MyUserUnsafeSerializer(serializers.ModelSerializer):
-#     password = serializers.CharField(max_length=50, min_length=6, write_only=True)
-
-#     class Meta:
-#         model = models.MyUser
-#         fields = (
-#             'email', 'username', 'role', 'auth_token',
-#             'contracts_created', 'countersigns', 'reviews', 'signs',
-#         )
-
-#     def partial_update(self, instance, validated_data):
-#         password = validated_data.get('password')
-#         if password is not None:
-#             instance.set_password(password)
-#         return instance
+class PwdSerializer(serializers.Serializer):
+    password = serializers.CharField(
+        min_length=6, max_length=50, write_only=True)
