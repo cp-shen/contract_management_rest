@@ -117,16 +117,25 @@ class Contract(models.Model):
         count = self.countersign_set.filter(is_confirmed=False).count()
         if count > 0:
             raise ValidationError('%s people have not countersigned' % count)
+        count = self.countersign_set.filter(is_confirmed=True).count()
+        if count == 0:
+            raise ValidationError('no people have countersigned')
 
     def check_review(self):
         count = self.review_set.filter(is_confirmed=False).count()
         if count > 0:
             raise ValidationError('%s people have not reviewed' % count)
+        count = self.review_set.filter(is_confirmed=True).count()
+        if count == 0:
+            raise ValidationError('no people have not reviewed')
 
     def check_sign(self):
         count = self.sign_set.filter(is_confirmed=False).count()
         if count > 0:
             raise ValidationError('%s people have not signed' % count)
+        count = self.sign_set.filter(is_confirmed=True).count()
+        if count == 0:
+            raise ValidationError('no people have signed')
 
     def clean(self):
         if self.date_begin > self.date_end:
