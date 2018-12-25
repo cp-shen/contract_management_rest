@@ -10,7 +10,7 @@
 
 基于python，可以完全跨平台，兼容wsgi接口，可对接多种Web server
 
-一些废话： django设计理念(DRY don't repeat yourself)，减少代码冗余量，低耦合，高服用性balabala
+一些废话： django设计理念(DRY don't repeat yourself)，减少代码冗余量，低耦合，高复用性balabala
 
 ## 网络服务架构
 
