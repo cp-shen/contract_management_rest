@@ -98,11 +98,6 @@ class ContractSerializer(serializers.ModelSerializer):
             'countersigns', 'reviews', 'signs'
         )
 
-    def validate(self, data):
-        if data['date_begin'] > data['date_end']:
-            raise serializers.ValidationError("contract finish must occur after start")
-        return data
-
 
 class RegisterSerializer(serializers.Serializer):
     username = serializers.CharField(max_length=50, min_length=1)
