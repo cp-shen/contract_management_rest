@@ -6,7 +6,7 @@
 
 ## 后端框架
 
-django, django rest framework
+**django, django rest framework**
 
 基于python，可以完全跨平台，兼容wsgi接口，可对接多种Web server
 
