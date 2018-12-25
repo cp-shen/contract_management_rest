@@ -29,7 +29,7 @@ class CountersignSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Countersign
         fields = (
-            'user', 'contract', 'message', 'is_confirmed',
+            'id', 'user', 'contract', 'message', 'is_confirmed',
         )
 
 
@@ -46,7 +46,7 @@ class ReivewSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Review
         fields = (
-            'user', 'contract', 'message', 'is_confirmed',
+            'id', 'user', 'contract', 'message', 'is_confirmed',
         )
 
 
@@ -63,7 +63,7 @@ class SignSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Sign
         fields = (
-            'user', 'contract', 'message', 'is_confirmed',
+            'id', 'user', 'contract', 'message', 'is_confirmed',
         )
 
 

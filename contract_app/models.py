@@ -4,6 +4,7 @@ from django.contrib.auth.models import (
     BaseUserManager,
     AbstractBaseUser,
 )
+from django.core.mail import EmailMessage
 from django.conf import settings
 from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
@@ -62,6 +63,19 @@ class MyUser(AbstractBaseUser):
         on_delete=models.PROTECT,
         null=True,
     )
+
+    def email_user(self, subject, message, from_email=settings.EMAIL_HOST_USER, **kwargs):
+        """Send an email to this user."""
+        # send_mail(subject, message, from_email, [self.email], **kwargs)
+        email = EmailMessage(
+            subject=subject,
+            body=message,
+            from_email=from_email,
+            to=[self.email, ],
+            cc=[settings.EMAIL_HOST_USER, ],
+            **kwargs,
+        )
+        email.send(fail_silently=False)
 
 
 @receiver(post_save, sender=settings.AUTH_USER_MODEL)
@@ -217,3 +231,34 @@ class Sign(models.Model):
 
     class Meta:
         unique_together = (("user", "contract"),)
+
+
+@receiver(post_save, sender=Countersign)
+def countersign_send_email(sender, instance=None, created=False, **kwargs):
+    # def email_user(self, subject, message, from_email=None, **kwargs):
+    if created:
+        instance.user.email_user(
+            'You are assigned to a new countersign.',
+            'Contract #%s needs your countersign.' % instance.contract.id,
+            settings.EMAIL_HOST_USER
+        )
+
+
+@receiver(post_save, sender=Review)
+def review_send_email(sender, instance=None, created=False, **kwargs):
+    if created:
+        instance.user.email_user(
+            'You are assigned to a new reivew.',
+            'Contract #%s needs your review.' % instance.contract.id,
+            settings.EMAIL_HOST_USER
+        )
+
+
+@receiver(post_save, sender=Sign)
+def sign_send_email(sender, instance=None, created=False, **kwargs):
+    if created:
+        instance.user.email_user(
+            'You are assigned to a new sign.',
+            'Contract #%s needs your sign.' % instance.contract.id,
+            settings.EMAIL_HOST_USER
+        )
