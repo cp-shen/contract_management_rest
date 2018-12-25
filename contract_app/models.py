@@ -128,26 +128,26 @@ class Contract(models.Model):
         return ':'.join([str(self.id), self.title])
 
     def check_countersign(self):
-        count = self.countersign_set.filter(is_confirmed=False).count()
+        count = self.countersigns.filter(is_confirmed=False).count()
         if count > 0:
             raise ValidationError('%s people have not countersigned' % count)
-        count = self.countersign_set.filter(is_confirmed=True).count()
+        count = self.countersigns.filter(is_confirmed=True).count()
         if count == 0:
             raise ValidationError('no people have countersigned')
 
     def check_review(self):
-        count = self.review_set.filter(is_confirmed=False).count()
+        count = self.reviews.filter(is_confirmed=False).count()
         if count > 0:
             raise ValidationError('%s people have not reviewed' % count)
-        count = self.review_set.filter(is_confirmed=True).count()
+        count = self.reviews.filter(is_confirmed=True).count()
         if count == 0:
             raise ValidationError('no people have not reviewed')
 
     def check_sign(self):
-        count = self.sign_set.filter(is_confirmed=False).count()
+        count = self.signs.filter(is_confirmed=False).count()
         if count > 0:
             raise ValidationError('%s people have not signed' % count)
-        count = self.sign_set.filter(is_confirmed=True).count()
+        count = self.signs.filter(is_confirmed=True).count()
         if count == 0:
             raise ValidationError('no people have signed')
 
@@ -168,39 +168,6 @@ class Contract(models.Model):
             self.check_countersign()
             self.check_review()
             self.check_sign()
-
-
-@receiver(pre_save, sender=Contract)
-def contract_pre_save_clean(sender, instance, *args, **kwargs):
-    instance.full_clean()
-
-
-@receiver(post_save, sender=Contract)
-def contract_post_save_handler(sender, instance, *args, **kwargs):
-    """
-    automatically change the status afer saving contract objects
-    """
-    try:
-        if instance.status == Contract.CREATED:
-            pass
-        elif instance.status == Contract.DISTRIBUTED:
-            instance.check_countersign()
-            instance.status = Contract.COUNTERSIGNED
-            instance.save()
-        elif instance.status == Contract.COUNTERSIGNED:
-            pass
-        elif instance.status == Contract.REWRITED:
-            instance.check_review()
-            instance.status = Contract.REVIEWED
-            instance.save()
-        elif instance.status == Contract.REVIEWED:
-            instance.check_sign()
-            instance.status = Contract.SIGNED
-            instance.save()
-        elif instance.status == Contract.SIGNED:
-            pass
-    except ValidationError:
-        pass
 
 
 class Countersign(models.Model):
@@ -262,3 +229,50 @@ def sign_send_email(sender, instance=None, created=False, **kwargs):
             'Contract #%s needs your sign.' % instance.contract.id,
             settings.EMAIL_HOST_USER
         )
+
+
+@receiver(pre_save, sender=Contract)
+def contract_pre_save_clean(sender, instance, *args, **kwargs):
+    instance.full_clean()
+
+
+def change_contract_status(sender, instance, *args, **kwargs):
+    """
+    automatically change the status afer saving contract objects
+    """
+    try:
+        if instance.status == Contract.CREATED:
+            pass
+        elif instance.status == Contract.DISTRIBUTED:
+            instance.check_countersign()
+            instance.status = Contract.COUNTERSIGNED
+            instance.save()
+        elif instance.status == Contract.COUNTERSIGNED:
+            pass
+        elif instance.status == Contract.REWRITED:
+            instance.check_review()
+            instance.status = Contract.REVIEWED
+            instance.save()
+        elif instance.status == Contract.REVIEWED:
+            instance.check_sign()
+            instance.status = Contract.SIGNED
+            instance.save()
+        elif instance.status == Contract.SIGNED:
+            pass
+    except ValidationError:
+        pass
+
+
+@receiver(post_save, sender=Countersign)
+def countersign_post_save_handler(sender, instance, *args, **kwargs):
+    change_contract_status(sender=None, instance=instance.contract)
+
+
+@receiver(post_save, sender=Review)
+def review_post_save_handler(sender, instance, *args, **kwargs):
+    change_contract_status(sender=None, instance=instance.contract)
+
+
+@receiver(post_save, sender=Sign)
+def sign_post_save_handler(sender, instance, *args, **kwargs):
+    change_contract_status(sender=None, instance=instance.contract)
