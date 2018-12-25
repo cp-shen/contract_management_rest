@@ -5,7 +5,7 @@
 <!-- - [ ] test cases -->
 <!-- - [ ] error message format * -->
 
-- [ ] PwdChangeView
+- [x] PwdChangeView
 - [x] User CRUD view
 - [x] My Detail view
 - [x] List Filter (search)
